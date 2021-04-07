@@ -1,0 +1,7 @@
+/node_modules
+package-lock.json
+aws.xml
+lotery-backend.iml
+modules.xml
+vcs.xml
+/.idea

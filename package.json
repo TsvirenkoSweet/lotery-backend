@@ -1,0 +1,28 @@
+{
+  "name": "lotery-backend",
+  "version": "1.0.0",
+  "description": "Rest Api backend based on nodejs framework express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TsvirenkoSweet/lotery-backend.git"
+  },
+  "keywords": [
+    "restapi",
+    "nodejs",
+    "express",
+    "javascript"
+  ],
+  "author": "Andrii Tsvirenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TsvirenkoSweet/lotery-backend/issues"
+  },
+  "homepage": "https://github.com/TsvirenkoSweet/lotery-backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
