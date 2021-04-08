@@ -46,7 +46,7 @@ const productSchema = new Schema({
     },
     deleteDate: {
         type: Date,
-        default: Date.now
+        default: ''
     },
     createdAt: Number,
     updatedAt: Number,
