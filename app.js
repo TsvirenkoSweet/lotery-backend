@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet')
 const mongoose = require('mongoose');
 const passport = require('passport');
 const bodyParser = require('body-parser');
@@ -9,6 +10,8 @@ const userRoutes = require('./routes/user');
 const productRoutes = require('./routes/product');
 const keys = require('./config/keys')
 const app = express();
+
+app.use(helmet());
 
 mongoose.connect(keys.mongoURI)
     .then(() => console.log('mongo db connected'))
