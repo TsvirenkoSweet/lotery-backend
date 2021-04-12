@@ -8,8 +8,9 @@ module.exports.getById = async function (req, res) {
     if (!id) { res.status(400).json({ message: 'id param is required' }) }
 
     try {
+        const currentUser = await User.findById({_id: req.user.id});
         const foundUser = await User.findById(id);
-        if (foundUser && foundUser.role === 'admin') {
+        if (foundUser && currentUser.role === 'admin') {
             foundUser ? res.status(200).json({ user: foundUser }) : status.notFound(res, 'User not found');
         } else {
             status.badRequest(res, 'You dont have access to this request');
@@ -57,15 +58,15 @@ module.exports.update = async function (req, res) {
 }
 
 module.exports.remove = async function (req, res) {
-    const { _id } = req.params;
-    if (!_id) { res.status(400).json({ message: 'id param is required' }) }
+    const { id } = req.params;
+    if (!id) { res.status(400).json({ message: 'id param is required' }) }
 
     try {
         const foundUser = await User.findOne({_id: req.user.id});
 
         if (foundUser && foundUser.role === 'admin') {
-            if (req.user.id !== _id) {
-                await User.remove({_id});
+            if (req.user.id !== id) {
+                await User.remove({_id: id});
                 res.status(200).json({ message: 'user has been deleted' });
             } else {
                 status.badRequest(res, 'You cant remove yourself');
