@@ -9,7 +9,11 @@ module.exports.getById = async function (req, res) {
 
     try {
         const foundUser = await User.findById(id);
-        foundUser ? status.ok(res, foundUser) : status.notFound(res, 'User not found');
+        if (foundUser && foundUser.role === 'admin') {
+            foundUser ? res.status(200).json({ user: foundUser }) : status.notFound(res, 'User not found');
+        } else {
+            status.badRequest(res, 'You dont have access to this request');
+        }
     } catch (e) {
         errorHandler(res, e);
     }
@@ -17,7 +21,7 @@ module.exports.getById = async function (req, res) {
 module.exports.getMyAccount = async function (req, res) {
     try {
         const user = await User.findById({_id: req.user.id});
-        user ? status.ok(res, user) : status.notFound(res, 'User not found');
+        user ? res.status(200).json({ user }) : status.notFound(res, 'User not found');
     } catch (e) {
         errorHandler(res, e);
     }
@@ -29,7 +33,7 @@ module.exports.getAll = async function (req, res) {
 
         if (foundUser && foundUser.role === 'admin') {
             const users = await User.find();
-            status.ok(res, users)
+            res.status(200).json({ users })
         } else {
             status.badRequest(res, 'You dont have access to this request');
         }
@@ -46,7 +50,7 @@ module.exports.update = async function (req, res) {
             { $set: body },
             { new: true}
             );
-        status.ok(res, user)
+        res.status(200).json({ user });
     } catch (e) {
         errorHandler(res, e);
     }
@@ -62,7 +66,7 @@ module.exports.remove = async function (req, res) {
         if (foundUser && foundUser.role === 'admin') {
             if (req.user.id !== _id) {
                 await User.remove({_id});
-                status.ok(res, { message: 'user has been deleted'})
+                res.status(200).json({ message: 'user has been deleted' });
             } else {
                 status.badRequest(res, 'You cant remove yourself');
             }

@@ -23,7 +23,7 @@ module.exports.login = async function (req, res) {
             }
             const token = jwt.sign(payload, keys.jwt, { expiresIn: 60 * 60 });
 
-            status.ok(res, token)
+            res.status(200).json({ token })
 
         } else {
             res.status(401).json({
