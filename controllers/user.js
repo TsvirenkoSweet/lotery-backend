@@ -78,6 +78,27 @@ module.exports.remove = async function (req, res) {
         errorHandler(res, e);
     }
 }
+module.exports.buyToken = async function (req, res) {
+    //emulate response from some BANK API
+    const bankResponse = {
+        status: 'ok',
+        tokenCount: 100
+    }
+
+    try {
+        const foundUser = await User.findOne({_id: req.user.id});
+        const { _id } = foundUser;
+        const balance = foundUser.balance + bankResponse.tokenCount;
+        await User.updateOne(
+            { _id },
+            { $set: { balance }},
+            { new: true}
+        );
+        res.status(200).json({ balance });
+    } catch (e) {
+        errorHandler(res, e);
+    }
+}
 
 async function updateUserBody(body) {
     let { password } = body;

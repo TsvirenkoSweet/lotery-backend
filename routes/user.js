@@ -8,6 +8,7 @@ router.get('/my-account', passport.authenticate('jwt', {session: false}), user.g
 router.get('/:id', passport.authenticate('jwt', {session: false}), user.getById);
 router.patch('/', passport.authenticate('jwt', {session: false}), user.update);
 router.delete('/:id', passport.authenticate('jwt', {session: false}), user.remove);
+router.post('/buy-token', passport.authenticate('jwt', {session: false}), user.buyToken);
 
 module.exports = router;
 
