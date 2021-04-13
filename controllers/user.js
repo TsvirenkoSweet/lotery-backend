@@ -8,8 +8,13 @@ module.exports.getById = async function (req, res) {
     if (!id) { res.status(400).json({ message: 'id param is required' }) }
 
     try {
+        const currentUser = await User.findById({_id: req.user.id});
         const foundUser = await User.findById(id);
-        foundUser ? status.ok(res, foundUser) : status.notFound(res, 'User not found');
+        if (foundUser && currentUser.role === 'admin') {
+            foundUser ? res.status(200).json({ user: foundUser }) : status.notFound(res, 'User not found');
+        } else {
+            status.badRequest(res, 'You dont have access to this request');
+        }
     } catch (e) {
         errorHandler(res, e);
     }
@@ -17,7 +22,7 @@ module.exports.getById = async function (req, res) {
 module.exports.getMyAccount = async function (req, res) {
     try {
         const user = await User.findById({_id: req.user.id});
-        user ? status.ok(res, user) : status.notFound(res, 'User not found');
+        user ? res.status(200).json({ user }) : status.notFound(res, 'User not found');
     } catch (e) {
         errorHandler(res, e);
     }
@@ -29,7 +34,7 @@ module.exports.getAll = async function (req, res) {
 
         if (foundUser && foundUser.role === 'admin') {
             const users = await User.find();
-            status.ok(res, users)
+            res.status(200).json({ users })
         } else {
             status.badRequest(res, 'You dont have access to this request');
         }
@@ -44,31 +49,56 @@ module.exports.update = async function (req, res) {
         const user = await User.findOneAndUpdate(
             { _id: req.user.id },
             { $set: body },
-            { new: true}
+            { new: true, omitUndefined: true }
             );
-        status.ok(res, user)
+        res.status(200).json({ user });
     } catch (e) {
         errorHandler(res, e);
     }
 }
 
 module.exports.remove = async function (req, res) {
-    const { _id } = req.params;
-    if (!_id) { res.status(400).json({ message: 'id param is required' }) }
+    const { id } = req.params;
+    if (!id) { res.status(400).json({ message: 'id param is required' }) }
 
     try {
         const foundUser = await User.findOne({_id: req.user.id});
 
         if (foundUser && foundUser.role === 'admin') {
-            if (req.user.id !== _id) {
-                await User.remove({_id});
-                status.ok(res, { message: 'user has been deleted'})
+            if (req.user.id !== id) {
+                try {
+                    await User.remove({_id: id});
+                    res.status(200).json({message: 'user has been deleted'});
+                } catch (e) {
+                    errorHandler(res, e);
+                }
             } else {
                 status.badRequest(res, 'You cant remove yourself');
             }
         } else {
             status.badRequest(res, 'You dont have access to this request');
         }
+    } catch (e) {
+        errorHandler(res, e);
+    }
+}
+module.exports.buyToken = async function (req, res) {
+    //emulate response from some BANK API
+    const bankResponse = {
+        status: 'ok',
+        tokenCount: 100
+    }
+
+    try {
+        const foundUser = await User.findOne({_id: req.user.id});
+        const { _id } = foundUser;
+        const balance = foundUser.balance + bankResponse.tokenCount;
+        await User.updateOne(
+            { _id },
+            { $set: { balance }},
+            { new: true}
+        );
+        res.status(200).json({ balance });
     } catch (e) {
         errorHandler(res, e);
     }

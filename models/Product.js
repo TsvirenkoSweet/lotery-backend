@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
+const uuid = require('uuid');
 const Schema = mongoose.Schema;
 
 const productSchema = new Schema({
+    _id: {
+        type: String,
+        default: uuid.v4
+    },
     title: {
         type: String,
         required: true
@@ -11,8 +16,8 @@ const productSchema = new Schema({
         default: ''
     },
     description: {
-        type: String,
-        required: true
+        type: Object,
+        default: {}
     },
     status: {
         type: String,
@@ -25,16 +30,15 @@ const productSchema = new Schema({
     },
     progress: {
         type: Number,
-        required: true,
         default: 0
     },
     daysToStart: {
         type: Date,
-        default: Date.now
+        required: true
     },
     daysToEnd: {
         type: Date,
-        default: Date.now
+        required: true
     },
     streamLink: {
         type: String,
@@ -42,7 +46,7 @@ const productSchema = new Schema({
     },
     productLink: {
         type: String,
-        default: ''
+        required: true
     },
     deleteDate: {
         type: Date,
