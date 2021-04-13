@@ -49,7 +49,7 @@ module.exports.update = async function (req, res) {
         const user = await User.findOneAndUpdate(
             { _id: req.user.id },
             { $set: body },
-            { new: true}
+            { new: true, omitUndefined: true }
             );
         res.status(200).json({ user });
     } catch (e) {
@@ -66,8 +66,12 @@ module.exports.remove = async function (req, res) {
 
         if (foundUser && foundUser.role === 'admin') {
             if (req.user.id !== id) {
-                await User.remove({_id: id});
-                res.status(200).json({ message: 'user has been deleted' });
+                try {
+                    await User.remove({_id: id});
+                    res.status(200).json({message: 'user has been deleted'});
+                } catch (e) {
+                    errorHandler(res, e);
+                }
             } else {
                 status.badRequest(res, 'You cant remove yourself');
             }
