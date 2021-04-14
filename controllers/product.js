@@ -164,7 +164,7 @@ module.exports.buy = async function (req, res) {
                     { $set: updated },
                     { new: true, omitUndefined: true }
                 )
-                res.status(201).json({ message: 'Successfully both a ticket'});
+                res.status(201).json({ message: 'The ticket has bought successfully'});
             } catch (e) {
                 errorHandler(res, e);
             }
