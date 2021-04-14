@@ -1,18 +1,19 @@
 const mongoose = require('mongoose');
+const uuid = require('uuid');
 const Schema = mongoose.Schema;
 
 const userProductSchema = new Schema({
+    _id: {
+        type: String,
+        default: uuid.v4
+    },
     balanceCount: {
         type: Number,
         required: true
     },
-    user: {
-        ref: 'users',
-        type: Schema.Types.ObjectId
-    },
     product: {
         ref: 'products',
-        type: Schema.Types.ObjectId
+        type: String
     }
 });
 

@@ -49,10 +49,12 @@ const userSchema = new Schema({
         type: Date,
         default: ''
     },
-    userProduct: {
-        ref: 'user_products',
-        type: Schema.Types.ObjectId
-    }
+    userProduct: [
+        {
+            ref: 'user_products',
+            type: String
+        }
+    ]
 });
 
 userSchema.set('timestamp', true);
