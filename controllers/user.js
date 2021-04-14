@@ -21,13 +21,22 @@ module.exports.getById = async function (req, res) {
 }
 module.exports.getMyAccount = async function (req, res) {
     try {
-        const user = await User.findById({_id: req.user.id});
-        user ? res.status(200).json({ user }) : status.notFound(res, 'User not found');
+        await User.findById({_id: req.user.id})
+            .populate({
+                path: 'userProduct',
+                populate: {
+                    path: 'product'
+                }
+            }).exec((err, user) => {
+                if (err) {
+                    status.badRequest(res, err.message);
+                }
+                user ? res.status(200).json({ user }) : status.notFound(res, 'User not found');
+            });
     } catch (e) {
         errorHandler(res, e);
     }
 }
-
 module.exports.getAll = async function (req, res) {
     try {
         const foundUser = await User.findOne({_id: req.user.id});
@@ -42,7 +51,6 @@ module.exports.getAll = async function (req, res) {
         errorHandler(res, e);
     }
 }
-
 module.exports.update = async function (req, res) {
     try {
         const body = await updateUserBody(req.body);
@@ -56,7 +64,6 @@ module.exports.update = async function (req, res) {
         errorHandler(res, e);
     }
 }
-
 module.exports.remove = async function (req, res) {
     const { id } = req.params;
     if (!id) { res.status(400).json({ message: 'id param is required' }) }

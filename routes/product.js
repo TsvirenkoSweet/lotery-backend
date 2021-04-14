@@ -9,6 +9,7 @@ router.get('/:id', product.getById);
 router.post('/', passport.authenticate('jwt', {session: false}), upload.single('image'),  product.create);
 router.patch('/:id', passport.authenticate('jwt', {session: false}), upload.single('image'), product.update);
 router.delete('/:id', passport.authenticate('jwt', {session: false}), product.remove);
+router.post('/buy/:id/:count', passport.authenticate('jwt', {session: false}),  product.buy);
 
 module.exports = router;
 

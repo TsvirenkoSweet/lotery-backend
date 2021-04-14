@@ -1,5 +1,6 @@
 const Product = require('../models/Product');
 const User = require('../models/User');
+const UserProduct = require('../models/UserProduct');
 const errorHandler = require('../utils/errorHandler');
 const status = require('../utils/statusMessage');
 
@@ -125,3 +126,52 @@ module.exports.remove = async function (req, res) {
     }
 }
 
+module.exports.buy = async function (req, res) {
+    const userId = req.user.id;
+    const productId = req.params.id;
+    const count = +req.params.count;
+
+    if (!count) {
+        status.badRequest(res, 'The count must be an integer');
+    }
+
+    try {
+        const product = await Product.findOne({_id: productId});
+        const user = await User.findOne({_id: userId});
+
+        const { balance } = user;
+        const { price } = product;
+
+        if (product && user) {
+            if (balance < (price * count)) {
+                res.status(409).json({
+                    message: 'You dont have tokens'
+                })
+            }
+
+            const userProduct = new UserProduct({
+                balanceCount: count,
+                product: product._id
+            });
+            const updated = {
+                balance: balance - (price * count),
+                userProduct: userProduct._id
+            }
+            try {
+                await userProduct.save();
+                await User.updateOne(
+                    { _id: userId },
+                    { $set: updated },
+                    { new: true, omitUndefined: true }
+                )
+                res.status(201).json({ message: 'The ticket has bought successfully'});
+            } catch (e) {
+                errorHandler(res, e);
+            }
+        } else {
+            status.notFound(res, 'User or Product not found')
+        }
+    } catch (e) {
+        errorHandler(res, e);
+    }
+}
